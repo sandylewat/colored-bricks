@@ -2,29 +2,25 @@
   "name": "bricksface",
   "author": "MakeAwesomeHappen",
   "version": "1.0.0",
-  "keywords": ["pebble-app"],
+  "keywords": [
+    "pebble-app",
+    "watchface",
+    "lego",
+    "bricks"
+  ],
   "private": true,
   "dependencies": {},
   "pebble": {
-    "displayName": "bricksface",
+    "displayName": "Bricks Face",
     "uuid": "2900143a-e7e3-4204-9f31-c6291ec9768b",
     "sdkVersion": "3",
     "enableMultiJS": true,
     "targetPlatforms": [
-      "aplite",
-      "basalt",
-      "chalk",
-      "diorite",
-      "emery",
-      "flint",
-      "gabbro"
+      "emery"
     ],
     "watchapp": {
-      "watchface": false
+      "watchface": true
     },
-    "messageKeys": [
-      "dummy"
-    ],
     "resources": {
       "media": []
     }
