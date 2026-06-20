@@ -46,15 +46,15 @@
         "defaultValue": "9",
         "options": [
           { "label": "Random (default)", "value": "0" },
-          { "label": "Red",             "value": "1" },
-          { "label": "Blue",            "value": "2" },
-          { "label": "Yellow",          "value": "3" },
-          { "label": "Green",           "value": "4" },
-          { "label": "Orange",          "value": "5" },
-          { "label": "Cyan",            "value": "6" },
-          { "label": "Magenta",         "value": "7" },
-          { "label": "Purple",          "value": "8" },
-          { "label": "White",           "value": "9" }
+          { "label": "Red", "value": "1" },
+          { "label": "Blue", "value": "2" },
+          { "label": "Yellow", "value": "3" },
+          { "label": "Green", "value": "4" },
+          { "label": "Orange", "value": "5" },
+          { "label": "Cyan", "value": "6" },
+          { "label": "Magenta", "value": "7" },
+          { "label": "Purple", "value": "8" },
+          { "label": "White", "value": "9" }
         ]
       }
     ]
@@ -86,7 +86,7 @@
         "defaultValue": "1",
         "options": [
           { "label": "Uniform colour (default)", "value": "0" },
-          { "label": "Per-digit colours",        "value": "1" }
+          { "label": "Per-digit colours", "value": "1" }
         ]
       },
       {
@@ -95,15 +95,16 @@
         "label": "Colour (uniform mode only)",
         "defaultValue": "0",
         "options": [
-          { "label": "White",   "value": "0" },
-          { "label": "Red",     "value": "1" },
-          { "label": "Blue",    "value": "2" },
-          { "label": "Yellow",  "value": "3" },
-          { "label": "Green",   "value": "4" },
-          { "label": "Orange",  "value": "5" },
-          { "label": "Cyan",    "value": "6" },
+          { "label": "White", "value": "0" },
+          { "label": "Red", "value": "1" },
+          { "label": "Blue", "value": "2" },
+          { "label": "Yellow", "value": "3" },
+          { "label": "Green", "value": "4" },
+          { "label": "Orange", "value": "5" },
+          { "label": "Cyan", "value": "6" },
           { "label": "Magenta", "value": "7" },
-          { "label": "Purple",  "value": "8" }
+          { "label": "Purple", "value": "8" },
+          { "label": "Black", "value": "9" }
         ]
       },
       {
@@ -113,15 +114,15 @@
         "defaultValue": "0",
         "options": [
           { "label": "Transparent (default)", "value": "0" },
-          { "label": "Black",                 "value": "1" },
-          { "label": "Red",                   "value": "2" },
-          { "label": "Blue",                  "value": "3" },
-          { "label": "Yellow",                "value": "4" },
-          { "label": "Green",                 "value": "5" },
-          { "label": "Orange",                "value": "6" },
-          { "label": "Cyan",                  "value": "7" },
-          { "label": "Magenta",               "value": "8" },
-          { "label": "Purple",                "value": "9" }
+          { "label": "Black", "value": "1" },
+          { "label": "Red", "value": "2" },
+          { "label": "Blue", "value": "3" },
+          { "label": "Yellow", "value": "4" },
+          { "label": "Green", "value": "5" },
+          { "label": "Orange", "value": "6" },
+          { "label": "Cyan", "value": "7" },
+          { "label": "Magenta", "value": "8" },
+          { "label": "Purple", "value": "9" }
         ]
       }
     ]
