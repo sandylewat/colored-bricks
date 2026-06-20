@@ -32,7 +32,8 @@
       "DIGIT_COLOR",
       "TIME_24H",
       "DIGIT_BG",
-      "BG_TYPE"
+      "BG_TYPE",
+      "DIG_OUTLINE"
     ],
     "resources": {
       "media": []

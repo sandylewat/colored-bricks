@@ -8,6 +8,7 @@
 #define MESSAGE_KEY_TIME_24H      10003
 #define MESSAGE_KEY_DIGIT_BG      10004
 #define MESSAGE_KEY_BG_TYPE       10005
+#define MESSAGE_KEY_DIG_OUTLINE   10006
 
 /* ── Geometry ─────────────────────────────────────────────────────────────── */
 #define CELL        14    /* digit brick pixel size                           */
@@ -58,6 +59,7 @@ typedef struct {
     int8_t digit_bg;    /* OFF-brick fill: 0 = transparent, 1 = black,
                          * 2-9 = LEGO colours (red…purple)                  */
     int8_t bg_type;     /* 0 = brick pattern (default), 1 = uniform fill    */
+    int8_t dig_outline; /* 0 = no outline (default), 1 = black outline      */
 } Settings;
 
 static Settings s_settings;
@@ -180,6 +182,12 @@ static void draw_digit_brick(GContext *ctx, int x, int y, GColor color) {
     GPoint c = GPoint(x + CELL / 2 - 1, y + CELL / 2 - 1);
     graphics_context_set_fill_color(ctx, darken(color));
     graphics_fill_circle(ctx, c, DIG_STUD);
+    /* Optional black outline */
+    if (s_settings.dig_outline) {
+        graphics_context_set_stroke_color(ctx, GColorBlack);
+        graphics_context_set_stroke_width(ctx, 1);
+        graphics_draw_round_rect(ctx, GRect(x, y, CELL - 1, CELL - 1), 2);
+    }
 }
 
 /* ── Canvas update ────────────────────────────────────────────────────────── */
@@ -301,6 +309,9 @@ static void inbox_received(DictionaryIterator *iter, void *ctx) {
                                               ? atoi(t->value->cstring)
                                               : t->value->int32);
 
+    t = dict_find(iter, MESSAGE_KEY_DIG_OUTLINE);
+    if (t) s_settings.dig_outline = (int8_t)t->value->int32;
+
     t = dict_find(iter, MESSAGE_KEY_BG_TYPE);
     if (t) s_settings.bg_type = (int8_t)t->value->int32;
 
@@ -326,6 +337,7 @@ static void settings_load(void) {
     s_settings.time_24h    = 1;   /* 24 h         */
     s_settings.digit_bg    = 0;   /* transparent  */
     s_settings.bg_type     = 0;   /* brick        */
+    s_settings.dig_outline = 0;   /* no outline   */
 
     /* Overwrite with stored values if they exist */
     persist_read_data(PKEY_SETTINGS, &s_settings, sizeof(Settings));
