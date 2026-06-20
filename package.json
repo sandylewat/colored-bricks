@@ -33,7 +33,9 @@
       "TIME_24H",
       "DIGIT_BG",
       "BG_TYPE",
-      "DIG_OUTLINE"
+      "DIG_OUTLINE",
+      "DIG_LAYOUT",
+      "BG_MATCH_DIG"
     ],
     "resources": {
       "media": []

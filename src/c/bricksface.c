@@ -9,13 +9,18 @@
 #define MESSAGE_KEY_DIGIT_BG      10004
 #define MESSAGE_KEY_BG_TYPE       10005
 #define MESSAGE_KEY_DIG_OUTLINE   10006
+#define MESSAGE_KEY_DIG_LAYOUT    10007
+#define MESSAGE_KEY_BG_MATCH_DIG  10008
 
 /* ── Geometry ─────────────────────────────────────────────────────────────── */
-#define CELL        14    /* digit brick pixel size                           */
+#define CELL        14    /* 3×5 digit brick pixel size                       */
+#define CELL6        7    /* 6×7 digit brick pixel size                       */
 #define BG_CELL     10    /* background brick pixel size                      */
-#define DIG_STUD     3    /* digit brick stud radius                          */
+#define DIG_STUD     3    /* 3×5 digit brick stud radius                      */
+#define DIG_STUD6    2    /* 6×7 digit brick stud radius                      */
 #define BG_STUD      2    /* background brick stud radius                     */
 #define ANIM_MS     90    /* milliseconds between animation row reveals       */
+#define MAX_ROWS     7    /* maximum rows across all layouts (6×7)            */
 
 /*
  * Horizontal layout (200 px wide, emery):
@@ -29,6 +34,8 @@
 
 /* Vertically centre the 70-px tall (5 × CELL) digit block: (228 - 70) / 2 */
 #define TIME_Y   79
+/* Vertically centre the 49-px tall (7 × CELL6) digit block: (228 - 49) / 2 */
+#define TIME_Y6  90
 
 /* ── 3×5 digit bitmaps (bit 2 = left col, bit 0 = right col) ─────────────── */
 /* Index 10 is a blank (all OFF) used for the suppressed leading zero in 12 h */
@@ -47,6 +54,25 @@ static const uint8_t DIGIT_MAP[11][5] = {
     { 0b000, 0b000, 0b000, 0b000, 0b000 }, /* blank */
 };
 
+/* ── 6×7 digit bitmaps (bit 5 = left col, bit 0 = right col) ─────────────── */
+/*
+ * Each row is 6 bits wide, 7 rows tall. Strokes are 2 bricks wide for a
+ * bold LEGO-inspired look. Same horizontal positions as 3×5 (6×7 = 42 px).
+ */
+static const uint8_t DIGIT_MAP6[11][7] = {
+    { 0b111111, 0b110011, 0b110011, 0b110011, 0b110011, 0b110011, 0b111111 }, /* 0 */
+    { 0b011100, 0b001100, 0b001100, 0b001100, 0b001100, 0b001100, 0b001100 }, /* 1 */
+    { 0b111111, 0b110011, 0b000011, 0b111111, 0b110000, 0b110000, 0b111111 }, /* 2 */
+    { 0b111111, 0b000011, 0b000011, 0b001111, 0b000011, 0b000011, 0b111111 }, /* 3 */
+    { 0b110000, 0b110011, 0b110011, 0b110011, 0b111111, 0b000111, 0b000111 }, /* 4 */
+    { 0b111111, 0b110000, 0b110000, 0b111111, 0b000011, 0b110011, 0b111111 }, /* 5 */
+    { 0b111111, 0b110000, 0b110000, 0b111111, 0b110011, 0b110011, 0b111111 }, /* 6 */
+    { 0b111111, 0b000011, 0b000011, 0b000011, 0b000011, 0b000011, 0b000011 }, /* 7 */
+    { 0b011110, 0b110011, 0b110011, 0b011110, 0b110011, 0b110011, 0b011110 }, /* 8 */
+    { 0b011110, 0b110011, 0b110011, 0b011111, 0b000011, 0b110011, 0b011110 }, /* 9 */
+    { 0b000000, 0b000000, 0b000000, 0b000000, 0b000000, 0b000000, 0b000000 }, /* blank */
+};
+
 /* ── Settings ─────────────────────────────────────────────────────────────── */
 #define PKEY_SETTINGS 0
 
@@ -60,6 +86,8 @@ typedef struct {
                          * 2-9 = LEGO colours (red…purple)                  */
     int8_t bg_type;     /* 0 = brick pattern (default), 1 = uniform fill    */
     int8_t dig_outline; /* 0 = no outline (default), 1 = black outline      */
+    int8_t dig_layout;  /* 0 = 3×5 (default), 1 = 6×7                      */
+    int8_t bg_match_dig;/* 0 = fixed BG_CELL (default), 1 = match digit size */
 } Settings;
 
 static Settings s_settings;
@@ -163,30 +191,38 @@ static void get_display_digits(int digits[4]) {
 
 /* ── Drawing helpers ──────────────────────────────────────────────────────── */
 
-static void draw_bg_brick(GContext *ctx, int x, int y) {
-    GColor color = bg_solid_color(x / BG_CELL, y / BG_CELL);
-    /* Body — 1 px gap at right/bottom creates the mortar-line grid effect */
-    graphics_context_set_fill_color(ctx, color);
-    graphics_fill_rect(ctx, GRect(x, y, BG_CELL - 1, BG_CELL - 1), 0, GCornerNone);
-    /* Stud */
-    GPoint c = GPoint(x + BG_CELL / 2 - 1, y + BG_CELL / 2 - 1);
-    graphics_context_set_fill_color(ctx, darken(color));
-    graphics_fill_circle(ctx, c, BG_STUD);
+/* Number of rows in the current digit layout. */
+static int digit_row_count(void) {
+    return s_settings.dig_layout == 1 ? 7 : 5;
 }
 
-static void draw_digit_brick(GContext *ctx, int x, int y, GColor color) {
-    /* Body with slight rounded corners for the LEGO plate look */
+static void draw_bg_brick(GContext *ctx, int x, int y) {
+    int bgc  = s_settings.bg_match_dig
+               ? (s_settings.dig_layout == 1 ? CELL6 : CELL)
+               : BG_CELL;
+    int stud = bgc >= 12 ? 3 : bgc >= 8 ? 2 : 1;
+    GColor color = bg_solid_color(x / bgc, y / bgc);
     graphics_context_set_fill_color(ctx, color);
-    graphics_fill_rect(ctx, GRect(x, y, CELL - 1, CELL - 1), 2, GCornersAll);
-    /* Stud */
-    GPoint c = GPoint(x + CELL / 2 - 1, y + CELL / 2 - 1);
+    graphics_fill_rect(ctx, GRect(x, y, bgc - 1, bgc - 1), 0, GCornerNone);
+    GPoint c = GPoint(x + bgc / 2 - 1, y + bgc / 2 - 1);
     graphics_context_set_fill_color(ctx, darken(color));
-    graphics_fill_circle(ctx, c, DIG_STUD);
+    graphics_fill_circle(ctx, c, stud);
+}
+
+static void draw_digit_brick(GContext *ctx, int x, int y, int cell, int stud, GColor color) {
+    int corner = cell >= 10 ? 2 : 1;   /* radius scales with cell size */
+    /* Body */
+    graphics_context_set_fill_color(ctx, color);
+    graphics_fill_rect(ctx, GRect(x, y, cell - 1, cell - 1), corner, GCornersAll);
+    /* Stud */
+    GPoint c = GPoint(x + cell / 2 - 1, y + cell / 2 - 1);
+    graphics_context_set_fill_color(ctx, darken(color));
+    graphics_fill_circle(ctx, c, stud);
     /* Optional black outline */
     if (s_settings.dig_outline) {
         graphics_context_set_stroke_color(ctx, GColorBlack);
         graphics_context_set_stroke_width(ctx, 1);
-        graphics_draw_round_rect(ctx, GRect(x, y, CELL - 1, CELL - 1), 2);
+        graphics_draw_round_rect(ctx, GRect(x, y, cell - 1, cell - 1), corner);
     }
 }
 
@@ -202,9 +238,12 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
         graphics_fill_rect(ctx, bounds, 0, GCornerNone);
     } else {
         /* Brick pattern */
-        for (int r = 0; r * BG_CELL < bounds.size.h; r++) {
-            for (int c = 0; c * BG_CELL < bounds.size.w; c++) {
-                draw_bg_brick(ctx, c * BG_CELL, r * BG_CELL);
+        int bgc = s_settings.bg_match_dig
+                  ? (s_settings.dig_layout == 1 ? CELL6 : CELL)
+                  : BG_CELL;
+        for (int r = 0; r * bgc < bounds.size.h; r++) {
+            for (int c = 0; c * bgc < bounds.size.w; c++) {
+                draw_bg_brick(ctx, c * bgc, r * bgc);
             }
         }
     }
@@ -214,42 +253,58 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
     int dv[4];
     get_display_digits(dv);
 
+    bool layout6 = (s_settings.dig_layout == 1);
+    int dc    = layout6 ? CELL6     : CELL;
+    int ds    = layout6 ? DIG_STUD6 : DIG_STUD;
+    int drows = layout6 ? 7         : 5;
+    int dcols = layout6 ? 6         : 3;
+    int ty    = layout6 ? TIME_Y6   : TIME_Y;
+
     for (int d = 0; d < 4; d++) {
         GColor on_color = digit_on_color(d);
-        for (int row = 0; row < 5; row++) {
+        for (int row = 0; row < drows; row++) {
             if (row >= s_anim_rows[d]) break;
-            for (int col = 0; col < 3; col++) {
-                bool on = (DIGIT_MAP[dv[d]][row] >> (2 - col)) & 1;
+            uint8_t bits = layout6 ? DIGIT_MAP6[dv[d]][row]
+                                   : DIGIT_MAP[dv[d]][row];
+            for (int col = 0; col < dcols; col++) {
+                bool on = (bits >> (dcols - 1 - col)) & 1;
                 if (on) {
                     draw_digit_brick(ctx,
-                        DIG_X[d] + col * CELL,
-                        TIME_Y   + row * CELL,
-                        on_color);
+                        DIG_X[d] + col * dc, ty + row * dc,
+                        dc, ds, on_color);
                 } else if (s_settings.digit_bg != 0) {
                     draw_digit_brick(ctx,
-                        DIG_X[d] + col * CELL,
-                        TIME_Y   + row * CELL,
-                        digit_off_color());
+                        DIG_X[d] + col * dc, ty + row * dc,
+                        dc, ds, digit_off_color());
                 }
                 /* digit_bg == 0: transparent — background bricks show through */
             }
         }
     }
 
-    /* 3 ── Colon: always visible (never changes) */
-    draw_digit_brick(ctx, COLON_X, TIME_Y + 1 * CELL, GColorWhite);
-    draw_digit_brick(ctx, COLON_X, TIME_Y + 3 * CELL, GColorWhite);
+    /* 3 ── Colon */
+    if (layout6) {
+        /* Two bricks wide per dot at rows 2 and 4 of the 7-row grid */
+        draw_digit_brick(ctx, COLON_X,      ty + 2 * dc, dc, ds, GColorWhite);
+        draw_digit_brick(ctx, COLON_X + dc, ty + 2 * dc, dc, ds, GColorWhite);
+        draw_digit_brick(ctx, COLON_X,      ty + 4 * dc, dc, ds, GColorWhite);
+        draw_digit_brick(ctx, COLON_X + dc, ty + 4 * dc, dc, ds, GColorWhite);
+    } else {
+        draw_digit_brick(ctx, COLON_X, ty + 1 * dc, dc, ds, GColorWhite);
+        draw_digit_brick(ctx, COLON_X, ty + 3 * dc, dc, ds, GColorWhite);
+    }
 }
 
 /* ── Animation timer ──────────────────────────────────────────────────────── */
 
 static void anim_timer_cb(void *context) {
     s_anim_timer = NULL;
+    int max_rows = digit_row_count();
     bool still_animating = false;
     for (int d = 0; d < 4; d++) {
-        if (s_anim_rows[d] < 5) {
+        if (s_anim_rows[d] < max_rows) {
             s_anim_rows[d]++;
-            if (s_anim_rows[d] < 5) still_animating = true;
+            if (s_anim_rows[d] < max_rows) still_animating = true;
         }
     }
     layer_mark_dirty(s_canvas);
@@ -309,6 +364,16 @@ static void inbox_received(DictionaryIterator *iter, void *ctx) {
                                               ? atoi(t->value->cstring)
                                               : t->value->int32);
 
+    t = dict_find(iter, MESSAGE_KEY_BG_MATCH_DIG);
+    if (t) s_settings.bg_match_dig = (int8_t)t->value->int32;
+
+    t = dict_find(iter, MESSAGE_KEY_DIG_LAYOUT);
+    if (t) {
+        s_settings.dig_layout = (int8_t)t->value->int32;
+        /* Show full digits immediately after layout switch */
+        for (int d = 0; d < 4; d++) s_anim_rows[d] = MAX_ROWS;
+    }
+
     t = dict_find(iter, MESSAGE_KEY_DIG_OUTLINE);
     if (t) s_settings.dig_outline = (int8_t)t->value->int32;
 
@@ -338,6 +403,8 @@ static void settings_load(void) {
     s_settings.digit_bg    = 0;   /* transparent  */
     s_settings.bg_type     = 0;   /* brick        */
     s_settings.dig_outline = 0;   /* no outline   */
+    s_settings.dig_layout  = 0;   /* 3×5           */
+    s_settings.bg_match_dig = 0;  /* fixed size    */
 
     /* Overwrite with stored values if they exist */
     persist_read_data(PKEY_SETTINGS, &s_settings, sizeof(Settings));
@@ -358,7 +425,7 @@ static void window_load(Window *window) {
     struct tm *t  = localtime(&now);
     s_hours       = t->tm_hour;
     s_minutes     = t->tm_min;
-    for (int d = 0; d < 4; d++) s_anim_rows[d] = 5;
+    for (int d = 0; d < 4; d++) s_anim_rows[d] = MAX_ROWS;
 }
 
 static void window_unload(Window *window) {
