@@ -16,6 +16,12 @@
         "messageKey": "TIME_24H",
         "label": "24-hour format",
         "defaultValue": false
+      },
+      {
+        "type": "toggle",
+        "messageKey": "TIME_PADDING",
+        "label": "Force 2-digits hour (01-09)",
+        "defaultValue": true
       }
     ]
   },
