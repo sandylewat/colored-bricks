@@ -1,38 +1,64 @@
 # Bricks Face
 
-A brick-toys inspired Pebble watchface for the **Pebble Time 2 (emery)**. The entire
-screen is tiled with colourful bricks, and the current time is displayed
-in a custom **3×5 brick font** — every digit is built from individual
-14 px brick-style tiles.
+A LEGO brick-inspired Pebble watchface for the **Pebble Time 2 (emery)**. The
+entire screen is tiled with colourful bricks and the time is displayed in a
+custom brick font — every digit is built from individual brick-style tiles.
 
 ## Features
 
-- **Full-screen brick baseplate** — 10 px brick cells in 8 classic brick colours
-  (red, blue, yellow, green, orange, cyan, magenta, purple)
-- **3×5 brick digit font** — white bricks for lit pixels, dark-grey for unlit
-- **Animated minute transitions** — on each minute tick only the digit(s) that
-  actually changed build in row-by-row (top → bottom, 90 ms per row); unchanged
-  digits stay fully visible
-- **Battery-efficient** — redraws on `MINUTE_UNIT` only; no sub-second timers
-  outside of the brief 450 ms build animation
-- **Configurable via the Pebble phone app** — background colour, digit colour,
-  and time format (12 h / 24 h) can all be changed without recompiling
-  (see [Settings](#settings))
+- **Full-screen brick baseplate** — tiled with 8 classic LEGO colours (red,
+  blue, yellow, green, orange, cyan, magenta, purple) plus white
+- **Two digit layouts** — **3×5** (14 px bricks, bold) or **6×7** (7 px bricks,
+  finer 2-brick-stroke detail); both share the same 42 px wide digit footprint
+- **Animated minute transitions** — only the digit(s) that actually changed
+  rebuild row-by-row (top → bottom, 90 ms per row); unchanged digits stay static
+- **Battery-efficient** — redraws on `MINUTE_UNIT` only; the brief build
+  animation lasts at most 7 × 90 ms = 630 ms
+- **Configurable via the Pebble app** — all visual options are changeable
+  without recompiling (see [Settings](#settings))
 
 ## Settings
 
 Open the watchface settings from the Pebble app on your phone. Changes are
-saved to the watch's persistent storage and survive reboots.
+saved to persistent storage and survive reboots. Tap **Reset to Defaults** to
+restore the values listed below, then **Save Settings** to apply.
+
+### Background
 
 | Setting | Options | Default |
 |---|---|---|
-| **Time format** | 24-hour / 12-hour (leading zero suppressed) | 24 h |
-| **Background** | Random colour pattern, or any single LEGO colour | Random |
-| **Digit mode** | White · Uniform colour · Per-digit colours | White |
-| **Digit colour** | White or any of the 8 LEGO colours (uniform mode only) | White |
+| **Match digit brick size** | On / Off | **On** |
+| **Uniform (no brick pattern)** | On / Off | Off |
+| **Brick colour** | Random · Red · Blue · Yellow · Green · Orange · Cyan · Magenta · Purple · **White** | **White** |
 
-**Per-digit colours** assigns a fixed LEGO colour to each digit position:
-`H₁` → Red, `H₂` → Blue, `M₁` → Yellow, `M₂` → Green.
+- **Match digit brick size** — when on, background bricks resize to match the
+  current digit layout (14 px for 3×5, 7 px for 6×7) for a seamless grid.
+- **Uniform** — replaces the brick grid with a flat solid fill.
+- **Random** picks a colour per brick based on its grid position; changes
+  automatically in uniform mode.
+
+### Digit Colour
+
+| Setting | Options | Default |
+|---|---|---|
+| **Digit outline** | On / Off | **On** |
+| **6×7 brick layout** | On / Off | Off |
+| **Mode** | Uniform colour · Per-digit colours | **Per-digit colours** |
+| **Colour** *(uniform mode only)* | White · Red · Blue · Yellow · Green · Orange · Cyan · Magenta · Purple | White |
+| **Digit background** | Transparent · Black · Red · Blue · Yellow · Green · Orange · Cyan · Magenta · Purple | **Transparent** |
+
+- **Per-digit colours** assigns a fixed LEGO colour to each position:
+  `H₁` → Red · `H₂` → Blue · `M₁` → Yellow · `M₂` → Green.
+- **Digit background** controls the colour of OFF (unlit) bricks in the digit
+  area; transparent lets the background baseplate show through.
+
+### Time Format
+
+| Setting | Options | Default |
+|---|---|---|
+| **24-hour format** | On / Off | **Off (12 h)** |
+
+12 h mode suppresses the leading zero (e.g. `9:05`, not `09:05`).
 
 ## Building & running
 
@@ -43,54 +69,56 @@ pebble install --emulator emery       # test in the emery QEMU emulator
 pebble install --cloudpebble          # deploy to a paired real device
 ```
 
+> **Note:** whenever you add new `messageKeys` to `package.json`, run
+> `rm -rf build && pebble build` to force regeneration of `message_keys.json`.
+
 ## Target platform
 
-This watchface targets **emery** (Pebble Time 2, 200 × 228 px colour display).
+This watchface targets **emery** (Pebble Time 2, 200 × 228 px, 64-colour
+rectangular display).
 
 ## Project layout
 
 ```
-src/c/bricksface.c   Watchface source — background, digit renderer, animation
-resources/           Images, fonts, and other bundled resources (none currently)
-package.json         Project metadata (UUID, platform, watchface flag)
-wscript              Build rules
+src/c/bricksface.c     Watchface source — background, digit renderer, animation,
+                        settings (AppMessage + persist)
+src/pkjs/index.js      Clay boilerplate + reset-button customFn
+src/pkjs/config.json   Clay UI definition (all setting controls)
+package.json           Project metadata (UUID, platform, messageKeys, Clay dep)
+wscript                Build rules
 ```
 
 ## Customisation
 
-The settings listed in [Settings](#settings) are configurable at runtime via
-the Pebble app — no recompilation needed.
-
-For deeper changes (brick sizes, digit shapes, animation speed) all knobs live
-near the top of `src/c/bricksface.c`. After any change run `pebble build` and
-`pebble install --emulator emery` to preview.
+All settings in [Settings](#settings) are configurable at runtime. For deeper
+changes, the relevant constants live near the top of `src/c/bricksface.c`.
 
 ### Brick sizes
 
 ```c
-#define CELL     14   // digit brick pixel size  — increase for larger digits
-#define BG_CELL  10   // background brick size   — decrease for a denser grid
+#define CELL      14   // 3×5 digit brick size  — also drives TIME_Y
+#define CELL6      7   // 6×7 digit brick size
+#define BG_CELL   10   // background brick size (when match-digit is off)
 ```
 
-Changing `CELL` also shifts the digit positions. The horizontal layout
-formula is documented in the comment above the `DIG*_X` defines; update
-those values to keep everything centred:
+The horizontal layout formula keeps digit width at 42 px regardless of layout:
 
 ```
-3 + D(CELL×3) + 3 + D(CELL×3) + 3 + C(CELL) + 3 + D(CELL×3) + 3 + D(CELL×3) + 3 = 200
+3 + D(42) + 3 + D(42) + 3 + C(14) + 3 + D(42) + 3 + D(42) + 3 = 200 px
 ```
 
-`TIME_Y` controls the vertical position of the digit block. The
-current value centres it: `(228 - 5×CELL) / 2`.
+`TIME_Y` / `TIME_Y6` centre their respective digit blocks vertically:
+`TIME_Y = (228 − 5×CELL) / 2 = 79`,  `TIME_Y6 = (228 − 7×CELL6) / 2 = 90`.
 
 ### Stud sizes
 
 ```c
-#define DIG_STUD  3   // radius of the raised stud on digit bricks
-#define BG_STUD   2   // radius of the raised stud on background bricks
+#define DIG_STUD   3   // stud radius on 3×5 digit bricks
+#define DIG_STUD6  2   // stud radius on 6×7 digit bricks
+#define BG_STUD    2   // stud radius on background bricks (fixed-size mode)
 ```
 
-Set either to `0` to hide studs entirely for a flat tile look.
+Set any of these to `0` for a flat tile look.
 
 ### Animation speed
 
@@ -98,76 +126,41 @@ Set either to `0` to hide studs entirely for a flat tile look.
 #define ANIM_MS  90   // milliseconds between each row appearing
 ```
 
-Lower values make the build-in animation faster; raise them to slow it
-down. The full animation takes `5 × ANIM_MS` ms. Set to `0` to skip
-animation (instant display on every tick — still battery-safe because
-the underlying tick is `MINUTE_UNIT`). Only changed digits animate;
-unchanged ones remain fully visible throughout.
+Full animation: `rows × ANIM_MS` (5 rows → 450 ms for 3×5; 7 rows → 630 ms
+for 6×7). Set to `0` to skip animation entirely.
 
-### Digit shapes (the 3×5 font)
+### Digit shapes
 
-Each digit is a 5-element array of 3-bit row masks. Bit 2 = left
-column, bit 1 = middle column, bit 0 = right column. A `1` lights a
-white brick; a `0` shows a dark-grey brick.
+**3×5 font** — `DIGIT_MAP[11][5]`, 3-bit rows (bit 2 = left, bit 0 = right):
+
+```
+0b111  →  ■ ■ ■       0b101  →  ■ · ■
+0b001  →  · · ■       0b110  →  ■ ■ ·
+```
+
+**6×7 font** — `DIGIT_MAP6[11][7]`, 6-bit rows (bit 5 = left, bit 0 = right),
+bold 2-brick-wide strokes:
+
+```
+0b110011  →  ■ ■ · · ■ ■
+0b111111  →  ■ ■ ■ ■ ■ ■
+```
+
+Index `10` in both maps is `DIGIT_BLANK` (all zeros) — used to suppress the
+leading zero in 12 h mode.
+
+### LEGO colour palette
+
+Eight colours shared by background, digit ON, and digit background pickers:
 
 ```c
-static const uint8_t DIGIT_MAP[10][5] = {
-    { 0b111, 0b101, 0b101, 0b101, 0b111 }, /* 0 */
-    ...
-};
-```
-
-Visualise a row as a 3-cell grid:
-
-```
-0b111  →  ■ ■ ■
-0b101  →  ■ · ■
-0b001  →  · · ■
-0b110  →  ■ ■ ·
-```
-
-Edit any row of any digit to reshape the font. For example, to give
-`7` a mid-bar (like a European 7):
-
-```c
-{ 0b111, 0b001, 0b011, 0b001, 0b001 }, /* 7 with mid-bar */
-```
-
-### Background colour palette
-
-The eight background colours are plain RGB triples in `bg_brick_color()`:
-
-```c
+// indices 0-7: Red  Blue  Yellow  Green  Orange  Cyan  Magenta  Purple
 static const uint8_t R[8] = { 255,   0, 255,   0, 255, 170,   0, 255 };
 static const uint8_t G[8] = {   0,  85, 255, 170,  85,   0, 170,   0 };
 static const uint8_t B[8] = {   0, 255,   0,   0,   0, 255, 170, 170 };
 ```
 
-Each index is one colour: `{R[i], G[i], B[i]}`. Change any triple to
-swap that colour slot. Pebble's display has 2 bits per channel, so
-values are rounded to the nearest of 0, 85, 170, 255.
-
-The colour assigned to a brick is determined by:
-
-```c
-int i = ((col * 5) + (row * 7)) % 8;
-```
-
-Change the multipliers (`5`, `7`) to alter the pattern — larger primes
-produce a more scattered look; equal multipliers produce diagonal
-stripes.
-
-### Digit brick colours
-
-In `canvas_update_proc`, the ON/OFF colours are set per brick:
-
-```c
-GColor color = on ? GColorWhite : GColorDarkGray;
-```
-
-Swap `GColorWhite` for any named Pebble colour (e.g. `GColorYellow`,
-`GColorCyan`) to change the lit digit colour, and `GColorDarkGray` for
-the unlit cell colour.
+Pebble's display rounds each channel to the nearest of 0, 85, 170, 255.
 
 ## Documentation
 
