@@ -388,15 +388,15 @@ static void inbox_received(DictionaryIterator *iter, void *ctx) {
 
 static void settings_load(void) {
     /* Defaults */
-    s_settings.bg_color    = 0;   /* random      */
-    s_settings.digit_mode  = 0;   /* white        */
-    s_settings.digit_color = 0;   /* white        */
-    s_settings.time_24h    = 1;   /* 24 h         */
-    s_settings.digit_bg    = 0;   /* transparent  */
-    s_settings.bg_type     = 0;   /* brick        */
-    s_settings.dig_outline = 0;   /* no outline   */
-    s_settings.dig_layout  = 0;   /* 3×5           */
-    s_settings.bg_match_dig = 0;  /* fixed size    */
+    s_settings.bg_color     = 9;   /* white           */
+    s_settings.digit_mode   = 1;   /* per-digit        */
+    s_settings.digit_color  = 0;   /* white            */
+    s_settings.time_24h     = 0;   /* 12 h             */
+    s_settings.digit_bg     = 0;   /* transparent      */
+    s_settings.bg_type      = 0;   /* brick pattern    */
+    s_settings.dig_outline  = 1;   /* outline on       */
+    s_settings.dig_layout   = 0;   /* 3×5              */
+    s_settings.bg_match_dig = 1;   /* match digit size */
 
     /* Overwrite with stored values if they exist */
     persist_read_data(PKEY_SETTINGS, &s_settings, sizeof(Settings));

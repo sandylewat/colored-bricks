@@ -15,7 +15,7 @@
         "type": "toggle",
         "messageKey": "TIME_24H",
         "label": "24-hour format",
-        "defaultValue": true
+        "defaultValue": false
       }
     ]
   },
@@ -31,7 +31,7 @@
         "type": "toggle",
         "messageKey": "BG_MATCH_DIG",
         "label": "Match digit brick size",
-        "defaultValue": false
+        "defaultValue": true
       },
       {
         "type": "toggle",
@@ -43,7 +43,7 @@
         "type": "select",
         "messageKey": "BG_COLOR",
         "label": "Brick colour",
-        "defaultValue": "0",
+        "defaultValue": "9",
         "options": [
           { "label": "Random (default)", "value": "0" },
           { "label": "Red",             "value": "1" },
@@ -71,7 +71,7 @@
         "type": "toggle",
         "messageKey": "DIG_OUTLINE",
         "label": "Digit outline (black)",
-        "defaultValue": false
+        "defaultValue": true
       },
       {
         "type": "toggle",
@@ -83,7 +83,7 @@
         "type": "radiogroup",
         "messageKey": "DIGIT_MODE",
         "label": "Mode",
-        "defaultValue": "0",
+        "defaultValue": "1",
         "options": [
           { "label": "Uniform colour (default)", "value": "0" },
           { "label": "Per-digit colours",        "value": "1" }
