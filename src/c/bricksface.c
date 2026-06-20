@@ -11,6 +11,7 @@
 #define MESSAGE_KEY_DIG_OUTLINE   10006
 #define MESSAGE_KEY_DIG_LAYOUT    10007
 #define MESSAGE_KEY_BG_MATCH_DIG  10008
+#define MESSAGE_KEY_TIME_PADDING  10009
 
 /* ── Geometry ─────────────────────────────────────────────────────────────── */
 #define CELL        14    /* 3×5 digit brick pixel size                       */
@@ -82,6 +83,7 @@ typedef struct {
     int8_t digit_color; /* colour index used when digit_mode == 1            */
                         /* 0 = white, 1-8 = brick colour, 9 = black           */
     int8_t time_24h;    /* 0 = 12 h format, 1 = 24 h format (default)       */
+    int8_t time_padding;/* 0 = 1-9, 1 = 01-09 (default) */
     int8_t digit_bg;    /* OFF-brick fill: 0 = transparent, 1 = black,
                          * 2-9 = bricks colours (red…purple)                  */
     int8_t bg_type;     /* 0 = brick pattern (default), 1 = uniform fill    */
@@ -166,6 +168,7 @@ static GColor digit_off_color(void) {
 /*
  * Compute the four display digit values from s_hours / s_minutes and the
  * current time-format setting. Digit values are 0-9 or DIGIT_BLANK.
+ * Single digits (1-9 or 01-09) rendering is configured by time_padding
  * Called in both tick_handler (for change detection) and canvas_update_proc.
  */
 static void get_display_digits(int digits[4]) {
@@ -175,6 +178,9 @@ static void get_display_digits(int digits[4]) {
     if (!s_settings.time_24h) {
         h = h % 12;
         if (h == 0) h = 12;
+    }
+
+    if (!s_settings.time_padding) {
         blank_leading = (h < 10);   /* suppress leading zero: "9:05" not "09:05" */
     }
 
@@ -383,6 +389,9 @@ static void inbox_received(DictionaryIterator *iter, void *ctx) {
     t = dict_find(iter, MESSAGE_KEY_TIME_24H);
     if (t) s_settings.time_24h = (int8_t)t->value->int32;
 
+    t = dict_find(iter, MESSAGE_KEY_TIME_PADDING);
+    if (t) s_settings.time_padding = (int8_t)t->value->int32;
+
     persist_write_data(PKEY_SETTINGS, &s_settings, sizeof(Settings));
     layer_mark_dirty(s_canvas);
 }
@@ -395,6 +404,7 @@ static void settings_load(void) {
     s_settings.digit_mode   = 1;   /* per-digit        */
     s_settings.digit_color  = 0;   /* white            */
     s_settings.time_24h     = 0;   /* 12 h             */
+    s_settings.time_padding = 1;   /* 00-09            */
     s_settings.digit_bg     = 0;   /* transparent      */
     s_settings.bg_type      = 0;   /* brick pattern    */
     s_settings.dig_outline  = 1;   /* outline on       */

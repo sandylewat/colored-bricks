@@ -35,7 +35,8 @@
       "BG_TYPE",
       "DIG_OUTLINE",
       "DIG_LAYOUT",
-      "BG_MATCH_DIG"
+      "BG_MATCH_DIG",
+      "TIME_PADDING"
     ],
     "resources": {
       "media": []
