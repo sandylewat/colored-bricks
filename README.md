@@ -15,10 +15,29 @@ in a custom **3×5 brick font** — every digit is built from individual
   digits stay fully visible
 - **Battery-efficient** — redraws on `MINUTE_UNIT` only; no sub-second timers
   outside of the brief 450 ms build animation
+- **Configurable via the Pebble phone app** — background colour, digit colour,
+  and time format (12 h / 24 h) can all be changed without recompiling
+  (see [Settings](#settings))
+
+## Settings
+
+Open the watchface settings from the Pebble app on your phone. Changes are
+saved to the watch's persistent storage and survive reboots.
+
+| Setting | Options | Default |
+|---|---|---|
+| **Time format** | 24-hour / 12-hour (leading zero suppressed) | 24 h |
+| **Background** | Random colour pattern, or any single LEGO colour | Random |
+| **Digit mode** | White · Uniform colour · Per-digit colours | White |
+| **Digit colour** | White or any of the 8 LEGO colours (uniform mode only) | White |
+
+**Per-digit colours** assigns a fixed LEGO colour to each digit position:
+`H₁` → Red, `H₂` → Blue, `M₁` → Yellow, `M₂` → Green.
 
 ## Building & running
 
 ```sh
+npm install                           # first time only — installs pebble-clay
 pebble build                          # compile → build/bricksface.pbw
 pebble install --emulator emery       # test in the emery QEMU emulator
 pebble install --cloudpebble          # deploy to a paired real device
@@ -39,8 +58,11 @@ wscript              Build rules
 
 ## Customisation
 
-All visual and behavioural knobs live near the top of
-`src/c/bricksface.c`. After any change run `pebble build` and
+The settings listed in [Settings](#settings) are configurable at runtime via
+the Pebble app — no recompilation needed.
+
+For deeper changes (brick sizes, digit shapes, animation speed) all knobs live
+near the top of `src/c/bricksface.c`. After any change run `pebble build` and
 `pebble install --emulator emery` to preview.
 
 ### Brick sizes

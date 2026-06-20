@@ -9,7 +9,9 @@
     "bricks"
   ],
   "private": true,
-  "dependencies": {},
+  "dependencies": {
+    "pebble-clay": "^1.0.0"
+  },
   "pebble": {
     "displayName": "Bricks Face",
     "uuid": "2900143a-e7e3-4204-9f31-c6291ec9768b",
@@ -18,9 +20,16 @@
     "targetPlatforms": [
       "emery"
     ],
+    "capabilities": ["configuration"],
     "watchapp": {
       "watchface": true
     },
+    "messageKeys": [
+      "BG_COLOR",
+      "DIGIT_MODE",
+      "DIGIT_COLOR",
+      "TIME_24H"
+    ],
     "resources": {
       "media": []
     }
