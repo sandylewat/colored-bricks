@@ -1,6 +1,6 @@
 {
-  "name": "bricksface",
-  "author": "MakeAwesomeHappen",
+  "name": "colored-bricks",
+  "author": "socrates.codes",
   "version": "1.0.0",
   "keywords": [
     "pebble-app",
@@ -13,7 +13,7 @@
     "pebble-clay": "^1.0.0"
   },
   "pebble": {
-    "displayName": "Bricks Face",
+    "displayName": "Colored Bricks",
     "uuid": "2900143a-e7e3-4204-9f31-c6291ec9768b",
     "sdkVersion": "3",
     "enableMultiJS": true,

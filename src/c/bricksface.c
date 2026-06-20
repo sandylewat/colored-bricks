@@ -56,8 +56,8 @@ static const uint8_t DIGIT_MAP[11][5] = {
 
 /* ── 6×7 digit bitmaps (bit 5 = left col, bit 0 = right col) ─────────────── */
 /*
- * Each row is 6 bits wide, 7 rows tall. Strokes are 2 bricks wide for a
- * bold LEGO-inspired look. Same horizontal positions as 3×5 (6×7 = 42 px).
+ * Each row is 6 bits wide, 7 rows tall. Strokes are 2 bricks wide.
+ * Same horizontal positions as 3×5 (6×7 = 42 px).
  */
 static const uint8_t DIGIT_MAP6[11][7] = {
     { 0b111111, 0b110011, 0b110011, 0b110011, 0b110011, 0b110011, 0b111111 }, /* 0 */
@@ -77,13 +77,13 @@ static const uint8_t DIGIT_MAP6[11][7] = {
 #define PKEY_SETTINGS 0
 
 typedef struct {
-    int8_t bg_color;    /* 0 = random, 1-8 = solid LEGO colour, 9 = white   */
+    int8_t bg_color;    /* 0 = random, 1-8 = solid brick colour, 9 = white   */
     int8_t digit_mode;  /* 0 = white, 1 = uniform colour, 2 = per-digit     */
     int8_t digit_color; /* colour index used when digit_mode == 1            */
-                        /* 0 = white, 1-8 = LEGO colour                     */
+                        /* 0 = white, 1-8 = brick colour, 9 = black           */
     int8_t time_24h;    /* 0 = 12 h format, 1 = 24 h format (default)       */
     int8_t digit_bg;    /* OFF-brick fill: 0 = transparent, 1 = black,
-                         * 2-9 = LEGO colours (red…purple)                  */
+                         * 2-9 = bricks colours (red…purple)                  */
     int8_t bg_type;     /* 0 = brick pattern (default), 1 = uniform fill    */
     int8_t dig_outline; /* 0 = no outline (default), 1 = black outline      */
     int8_t dig_layout;  /* 0 = 3×5 (default), 1 = 6×7                      */
@@ -114,10 +114,10 @@ static GColor darken(GColor c) {
 }
 
 /*
- * Eight classic LEGO colours (indices 0-7):
+ * Eight classic bricks colours (indices 0-7):
  *   0=Red  1=Blue  2=Yellow  3=Green  4=Orange  5=Cyan  6=Magenta  7=Purple
  */
-static GColor lego_color(int idx) {
+static GColor bricks_color(int idx) {
     static const uint8_t R[8] = { 255,   0, 255,   0, 255, 170,   0, 255 };
     static const uint8_t G[8] = {   0,  85, 255, 170,  85,   0, 170,   0 };
     static const uint8_t B[8] = {   0, 255,   0,   0,   0, 255, 170, 170 };
@@ -131,31 +131,34 @@ static GColor bg_solid_color(int col, int row) {
     if (s_settings.bg_color == 0) {
         /* Random: vary by position for brick mode, vary by time for uniform */
         if (s_settings.bg_type == 1)
-            return lego_color(s_hours % 8);
-        return lego_color((col * 5) + (row * 7));
+            return bricks_color(s_hours % 8);
+        return bricks_color((col * 5) + (row * 7));
     }
-    return lego_color(s_settings.bg_color - 1);
+    return bricks_color(s_settings.bg_color - 1);
 }
 
 /*
  * ON-brick colour for digit position d (0-3):
  *   mode 0 → uniform colour (digit_color index; 0 = white)
- *   mode 1 → per-digit: each position gets a distinct LEGO colour
+ *   mode 1 → per-digit: each position gets a distinct bricks colour
  */
 static GColor digit_on_color(int d) {
-    if (s_settings.digit_mode == 1) return lego_color(d);
+    if (s_settings.digit_mode == 1) return bricks_color(d);
     return s_settings.digit_color == 0
            ? GColorWhite
-           : lego_color(s_settings.digit_color - 1);
+           : s_settings.digit_color == 9
+           ? GColorFromRGB(0, 0, 0)
+           : bricks_color(s_settings.digit_color - 1);
 }
 
 /*
  * OFF-brick fill colour for digit background:
- *   0 = transparent (skip drawing)  1 = black  2-9 = LEGO colours
+ *   0 = transparent (skip drawing)  1 = black  2-9 = bricks
+ *  colours
  */
 static GColor digit_off_color(void) {
     if (s_settings.digit_bg == 1) return GColorBlack;
-    return lego_color(s_settings.digit_bg - 2);
+    return bricks_color(s_settings.digit_bg - 2);
 }
 
 /* ── Display helpers ──────────────────────────────────────────────────────── */

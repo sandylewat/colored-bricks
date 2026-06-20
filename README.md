@@ -1,12 +1,11 @@
-# Bricks Face
+# Colored Bricks
 
-A LEGO brick-inspired Pebble watchface for the **Pebble Time 2 (emery)**. The
-entire screen is tiled with colourful bricks and the time is displayed in a
-custom brick font — every digit is built from individual brick-style tiles.
+A LEGO brick-inspired Pebble watchface for the Pebble Time 2 (emery).
+The time is displayed in a brick font, every digit is built from individual brick-style tiles.
 
 ## Features
 
-- **Full-screen brick baseplate** — tiled with 8 classic LEGO colours (red,
+- **Full-screen brick baseplate** — tiled with 8 colours (red,
   blue, yellow, green, orange, cyan, magenta, purple) plus white
 - **Two digit layouts** — **3×5** (14 px bricks, bold) or **6×7** (7 px bricks,
   finer 2-brick-stroke detail); both share the same 42 px wide digit footprint
@@ -47,7 +46,7 @@ restore the values listed below, then **Save Settings** to apply.
 | **Colour** *(uniform mode only)* | White · Red · Blue · Yellow · Green · Orange · Cyan · Magenta · Purple | White |
 | **Digit background** | Transparent · Black · Red · Blue · Yellow · Green · Orange · Cyan · Magenta · Purple | **Transparent** |
 
-- **Per-digit colours** assigns a fixed LEGO colour to each position:
+- **Per-digit colours** assigns a fixed bricks colour to each position:
   `H₁` → Red · `H₂` → Blue · `M₁` → Yellow · `M₂` → Green.
 - **Digit background** controls the colour of OFF (unlit) bricks in the digit
   area; transparent lets the background baseplate show through.
@@ -149,7 +148,7 @@ bold 2-brick-wide strokes:
 Index `10` in both maps is `DIGIT_BLANK` (all zeros) — used to suppress the
 leading zero in 12 h mode.
 
-### LEGO colour palette
+### Bricks colour palette
 
 Eight colours shared by background, digit ON, and digit background pickers:
 
