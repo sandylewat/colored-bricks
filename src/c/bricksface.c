@@ -274,16 +274,16 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
         }
     }
 
-    /* 3 ── Colon */
+    /* 3 ── Colon — colour follows digit colour mode */
+    GColor colon_color = digit_on_color(0);
     if (layout6) {
-        /* Two bricks wide per dot at rows 2 and 4 of the 7-row grid */
-        draw_digit_brick(ctx, COLON_X,      ty + 2 * dc, dc, ds, GColorWhite);
-        draw_digit_brick(ctx, COLON_X + dc, ty + 2 * dc, dc, ds, GColorWhite);
-        draw_digit_brick(ctx, COLON_X,      ty + 4 * dc, dc, ds, GColorWhite);
-        draw_digit_brick(ctx, COLON_X + dc, ty + 4 * dc, dc, ds, GColorWhite);
+        draw_digit_brick(ctx, COLON_X,      ty + 2 * dc, dc, ds, colon_color);
+        draw_digit_brick(ctx, COLON_X + dc, ty + 2 * dc, dc, ds, colon_color);
+        draw_digit_brick(ctx, COLON_X,      ty + 4 * dc, dc, ds, colon_color);
+        draw_digit_brick(ctx, COLON_X + dc, ty + 4 * dc, dc, ds, colon_color);
     } else {
-        draw_digit_brick(ctx, COLON_X, ty + 1 * dc, dc, ds, GColorWhite);
-        draw_digit_brick(ctx, COLON_X, ty + 3 * dc, dc, ds, GColorWhite);
+        draw_digit_brick(ctx, COLON_X, ty + 1 * dc, dc, ds, colon_color);
+        draw_digit_brick(ctx, COLON_X, ty + 3 * dc, dc, ds, colon_color);
     }
 }
 
