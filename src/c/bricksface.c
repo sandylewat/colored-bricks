@@ -64,7 +64,7 @@ static const uint8_t DIGIT_MAP6[11][7] = {
     { 0b011100, 0b001100, 0b001100, 0b001100, 0b001100, 0b001100, 0b001100 }, /* 1 */
     { 0b111111, 0b110011, 0b000011, 0b111111, 0b110000, 0b110000, 0b111111 }, /* 2 */
     { 0b111111, 0b000011, 0b000011, 0b001111, 0b000011, 0b000011, 0b111111 }, /* 3 */
-    { 0b110000, 0b110011, 0b110011, 0b110011, 0b111111, 0b000111, 0b000111 }, /* 4 */
+    { 0b110000, 0b110011, 0b110011, 0b110011, 0b111111, 0b000011, 0b000011 }, /* 4 */
     { 0b111111, 0b110000, 0b110000, 0b111111, 0b000011, 0b110011, 0b111111 }, /* 5 */
     { 0b111111, 0b110000, 0b110000, 0b111111, 0b110011, 0b110011, 0b111111 }, /* 6 */
     { 0b111111, 0b000011, 0b000011, 0b000011, 0b000011, 0b000011, 0b000011 }, /* 7 */
@@ -139,22 +139,14 @@ static GColor bg_solid_color(int col, int row) {
 
 /*
  * ON-brick colour for digit position d (0-3):
- *   mode 0 → white
- *   mode 1 → uniform custom colour (digit_color index)
- *   mode 2 → per-digit: each position gets a distinct LEGO colour
- *             d=0 Red, d=1 Blue, d=2 Yellow, d=3 Green
+ *   mode 0 → uniform colour (digit_color index; 0 = white)
+ *   mode 1 → per-digit: each position gets a distinct LEGO colour
  */
 static GColor digit_on_color(int d) {
-    switch (s_settings.digit_mode) {
-        case 1:
-            return s_settings.digit_color == 0
-                   ? GColorWhite
-                   : lego_color(s_settings.digit_color - 1);
-        case 2:
-            return lego_color(d);
-        default:
-            return GColorWhite;
-    }
+    if (s_settings.digit_mode == 1) return lego_color(d);
+    return s_settings.digit_color == 0
+           ? GColorWhite
+           : lego_color(s_settings.digit_color - 1);
 }
 
 /*

@@ -85,9 +85,8 @@
         "label": "Mode",
         "defaultValue": "0",
         "options": [
-          { "label": "White (default)",   "value": "0" },
-          { "label": "Uniform colour",    "value": "1" },
-          { "label": "Per-digit colours", "value": "2" }
+          { "label": "Uniform colour (default)", "value": "0" },
+          { "label": "Per-digit colours",        "value": "1" }
         ]
       },
       {
