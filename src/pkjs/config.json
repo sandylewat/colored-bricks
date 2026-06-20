@@ -28,6 +28,12 @@
         "size": 1
       },
       {
+        "type": "toggle",
+        "messageKey": "BG_TYPE",
+        "label": "Uniform (no brick pattern)",
+        "defaultValue": false
+      },
+      {
         "type": "select",
         "messageKey": "BG_COLOR",
         "label": "Brick colour",
@@ -41,7 +47,8 @@
           { "label": "Orange",          "value": "5" },
           { "label": "Cyan",            "value": "6" },
           { "label": "Magenta",         "value": "7" },
-          { "label": "Purple",          "value": "8" }
+          { "label": "Purple",          "value": "8" },
+          { "label": "White",           "value": "9" }
         ]
       }
     ]
@@ -80,6 +87,24 @@
           { "label": "Cyan",    "value": "6" },
           { "label": "Magenta", "value": "7" },
           { "label": "Purple",  "value": "8" }
+        ]
+      },
+      {
+        "type": "select",
+        "messageKey": "DIGIT_BG",
+        "label": "Digit background",
+        "defaultValue": "0",
+        "options": [
+          { "label": "Transparent (default)", "value": "0" },
+          { "label": "Black",                 "value": "1" },
+          { "label": "Red",                   "value": "2" },
+          { "label": "Blue",                  "value": "3" },
+          { "label": "Yellow",                "value": "4" },
+          { "label": "Green",                 "value": "5" },
+          { "label": "Orange",                "value": "6" },
+          { "label": "Cyan",                  "value": "7" },
+          { "label": "Magenta",               "value": "8" },
+          { "label": "Purple",                "value": "9" }
         ]
       }
     ]

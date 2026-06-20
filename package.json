@@ -20,7 +20,9 @@
     "targetPlatforms": [
       "emery"
     ],
-    "capabilities": ["configuration"],
+    "capabilities": [
+      "configuration"
+    ],
     "watchapp": {
       "watchface": true
     },
@@ -28,7 +30,9 @@
       "BG_COLOR",
       "DIGIT_MODE",
       "DIGIT_COLOR",
-      "TIME_24H"
+      "TIME_24H",
+      "DIGIT_BG",
+      "BG_TYPE"
     ],
     "resources": {
       "media": []
