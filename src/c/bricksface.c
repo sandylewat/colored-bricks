@@ -120,9 +120,9 @@ static GColor darken(GColor c) {
  *   0=Red  1=Blue  2=Yellow  3=Green  4=Orange  5=Cyan  6=Magenta  7=Purple
  */
 static GColor bricks_color(int idx) {
-    static const uint8_t R[8] = { 255,   0, 255,   0, 255, 170,   0, 255 };
-    static const uint8_t G[8] = {   0,  85, 255, 170,  85,   0, 170,   0 };
-    static const uint8_t B[8] = {   0, 255,   0,   0,   0, 255, 170, 170 };
+    static const uint8_t R[8] = { 255,   0, 255,   0, 255,   0, 255, 170 };
+    static const uint8_t G[8] = {   0,  85, 255, 170,  85, 170,   0,   0 };
+    static const uint8_t B[8] = {   0, 255,   0,   0,   0, 170, 170, 255 };
     int i = ((idx % 8) + 8) % 8;
     return GColorFromRGB(R[i], G[i], B[i]);
 }
