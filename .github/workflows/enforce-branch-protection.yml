@@ -1,0 +1,34 @@
+name: Validate Source Branch
+
+on:
+  pull_request:
+    branches:
+      - develop
+      - master
+
+jobs:
+  validate-branch:
+    name: Validate Source Branch
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check Branch Patterns
+        run: |
+          TARGET_BRANCH="${{ github.base_ref }}"
+          SOURCE_BRANCH="${{ github.head_ref }}"
+          echo "Target branch: $TARGET_BRANCH"
+          echo "Source branch: $SOURCE_BRANCH"
+          
+          if [ "$TARGET_BRANCH" = "develop" ]; then
+            if [[ ! "$SOURCE_BRANCH" =~ ^(feature/|bugfix/) ]]; then
+              echo "::error::Only branch names starting with 'feature/' or 'bugfix/' can be merged into 'develop'."
+              exit 1
+            fi
+          elif [ "$TARGET_BRANCH" = "master" ]; then
+            if [[ ! "$SOURCE_BRANCH" =~ ^(release/|hotfix/) ]]; then
+              echo "::error::Only branch names starting with 'release/' or 'hotfix/' can be merged into 'master'."
+              exit 1
+            fi
+          else
+            echo "No restrictions for target branch $TARGET_BRANCH."
+          fi
+          echo "Branch names are valid."
