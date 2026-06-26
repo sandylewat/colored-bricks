@@ -154,9 +154,9 @@ Eight colours shared by background, digit ON, and digit background pickers:
 
 ```c
 // indices 0-7: Red  Blue  Yellow  Green  Orange  Cyan  Magenta  Purple
-static const uint8_t R[8] = { 255,   0, 255,   0, 255, 170,   0, 255 };
-static const uint8_t G[8] = {   0,  85, 255, 170,  85,   0, 170,   0 };
-static const uint8_t B[8] = {   0, 255,   0,   0,   0, 255, 170, 170 };
+static const uint8_t R[8] = { 255,   0, 255,   0, 255,   0, 255, 170 };
+static const uint8_t G[8] = {   0,  85, 255, 170,  85, 170,   0,   0 };
+static const uint8_t B[8] = {   0, 255,   0,   0,   0, 170, 170, 255 };
 ```
 
 Pebble's display rounds each channel to the nearest of 0, 85, 170, 255.
